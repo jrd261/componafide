@@ -7,7 +7,7 @@ NodeJS got prospects. He's componafide.
 
 ## `const container = module();`
 
-## `container.register(name, factory, ...dependencies);
+## `container.register(name, factory, ...dependencies);`
 
 Name is any string you like to assign to this component.
 
@@ -83,7 +83,7 @@ module.exports = () => {
   return Promise.resolve(myPromise); // component will be literal promise, this smells better using async/await.
 }
 
-
+```
 
 
 # Example
