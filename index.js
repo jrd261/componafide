@@ -1,29 +1,50 @@
 'use strict';
 
-module.exports = () => {
+function Container () {
 
-  const registry = new Map();
+  const generators = new Map();
   const components = new Map();
 
-  function generate (name, targets) {
-    if (targets.has(name)) throw new Error(`Circular dependency detected for "${ name }".`);
-    if (!registry.has(name)) throw new Error(`Component "${ name }" not in registry.`);
-    targets.add(name);
-    const [ generator, dependencies ] = registry.get(name);
-    const components = dependencies.map(x => resolve(x, targets));
-    return generator(...components);
-  }
-
-  function resolve (name, targets) {
-    if (!components.has(name)) components.set(name, generate(name, targets || new Set()));
+  function resolve (name, children=new Set()) {
+    if (components.has(name)) return components.get(name);
+    if (!generators.has(name)) throw new Error(`Component "${ name }" is not registered.`);
+    if (children.has(name)) throw new Error(`Circular dependency detected for "${ name }".`);
+    children.add(name);
+    components.set(name, generators.get(name)(children));
     return components.get(name);
   }
 
-  function define (name, generator, ...dependencies) {
-    if (components.has(name)) throw new Error(`Component name "${ name }" already in use.`);
-    registry.set(name, [ generator, dependencies ]);
+  function register (name, factory, dependencies) {
+    if (generators.has(name)) throw new Error(`Component "${ name }" already registered.`);
+    generators.set(name, children => factory(...dependencies.map(x => resolve(x, children))));
   }
 
-  return { resolve: name => resolve(name), define };
+  return class {
+    static resolve (name) { return resolve(name); }
+    static component (name, generator, ...dependencies) { register(name, generator, dependencies); }
+    static constant (name, value) { register(name, () => value, []); }
+  };
 
+}
+
+const containers = new Map();
+
+function container (name='default') {
+  if (containers.get(name)) return containers.get(name);
+  containers.set(name, new Container());
+  return containers.get(name);
+}
+
+function delete_ (name) {
+  containers.delete(name);
+}
+
+function reset () {
+  for (let name of containers.keys()) containers.delete(name);
+}
+
+module.exports = class {
+  static container (name='default') { return container(name); }
+  static delete (name='default') { return delete_(name); }
+  static reset () { return reset(); }
 };

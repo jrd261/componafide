@@ -1,18 +1,19 @@
 'use strict';
 
-const componafide = require('./')();
+const container = require('componafide').container();
 
-componafide.define('component1', x => x + 1, 'component2');
-componafide.define('component2', () => 10);
-componafide.define('component3', () => {}, 'component3');
+container.component('component1', (x, y) => x - y, 'component2', 'constant1');
+container.component('component2', () => 99);
+container.component('component3', () => {}, 'component3');
+container.constant('constant1', 100);
 
-if (componafide.resolve('component1') !== 11) {
-  global.console.error('Test failed.');
+if (container.resolve('component1') !== -1) {
+  global.console.error('Test 1 failed.');
   process.exit(1);
 }
 
 try {
-  componafide.resolve('component3');
-  global.console.error('Test failed.');
+  container.resolve('component3');
+  global.console.error('Test 2 failed.');
   process.exit(1);
 } catch (error) {}
