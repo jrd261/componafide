@@ -1,0 +1,11 @@
+{
+  "name": "componafide",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "James Dalessio <jrd261@gmail.com>",
+  "license": "ISC"
+}
