@@ -17,13 +17,16 @@ function Container () {
   function register (name, factory, dependencies) {
     if (generators.has(name)) throw new Error(`Component "${ name }" already registered.`);
     generators.set(name, children => factory(...dependencies.map(x => resolve(x, children))));
+    return ContainerApi;
   }
 
-  return class {
+  class ContainerApi {
     static resolve (name) { return resolve(name); }
-    static component (name, generator, ...dependencies) { register(name, generator, dependencies); }
-    static constant (name, value) { register(name, () => value, []); }
-  };
+    static component (name, generator, ...dependencies) { return register(name, generator, dependencies); }
+    static constant (name, value) { return register(name, () => value, []); }
+  }
+
+  return ContainerApi;
 
 }
 
@@ -43,7 +46,7 @@ function reset () {
   for (let name of containers.keys()) containers.delete(name);
 }
 
-module.exports = class {
+module.exports = class ComponafideApi {
   static container (name='default') { return container(name); }
   static delete (name='default') { return delete_(name); }
   static reset () { return reset(); }
