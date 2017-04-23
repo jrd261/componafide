@@ -6,6 +6,9 @@ NodeJS got prospects. He's componafide.
 # Usage
 
 ## `const container = module();`
+## `container.register(name, factory, [dependencies]);`
+## `container.constant(name, value);`
+## `const component = container.resolve(name);`
 
 ## `container.register(name, factory, ...dependencies);`
 
@@ -46,8 +49,8 @@ const myComponent = container.resolve('myComponent');
 Still use dependency injection. If it feels stupid your are probably still doing it right.
 
 ```javascript
-container.register('native.process', () => global.process);
-container.register('pi', () => 3.14); // Because you might want to test what happens to your code when the universe implodes and pi changes to 23.
+container.constant('scope.process', process);
+container.constant('pi', () => 3.14); // Because you might want to test what happens to your code when the universe implodes and pi changes to 23.
 ```
 
 ## Components
@@ -65,6 +68,19 @@ Use asyncronously intialized components only when it feels like
 something that is absolutely part of getting your module up and
 running. It should be start up logic, not business logic.
 
+
+```javascript
+
+module.exports = () => {
+
+  function method1() {
+  }
+  
+  return class {
+    static method1 () { return method1(); }
+   }
+
+}
 
 ## Can I make a promise into a component?
 
@@ -93,36 +109,39 @@ module.exports = () => {
 
 const container = require('componafide')();
 
-container.register('native.fs', () => require('fs'));
-container.register('dapperDan', require('./dapperDan.js'), 'native.fs');
-container.register('hornyToad', require('./hornyToad.js'), 'dapperDan', 'native.fs');
+container.constant('log', console);
+container.component('Pomade', require('./Pomade'), ['log']);
+container.component('DapperDan', require('./DapperDan'), ['log', 'Pomade']);
 
-container.resolve('hornyToad', hornyToad => {
-  // Well there delmer, I reckon the application be starting or something like that. Its really just an example.
-});
+const DapperDan = container.resolve('DapperDan');
+const can1 = new DapperDan();
+can1.apply();
+
+```
+
+```javascript
+
+/* ./common/Pomade.js */
+
+module.exports = log => class Pomade {
+  apply () {
+    log.info('A pomade was applied.');
+  }
+}
 
 ```
 
 
-
 ```javascript
 
-/* dapperDan.js */
+/* ./core/DapperDan.js */
 
-module.exports = fs => {
-  return new Promise(resolve => fs.readFile('dapper-dan', resolve));
+module.exports = (log, Pomade) => class DapperDan extends Pomade {
+  apply () {
+    log.warn('Looking sharp!');
+    super.apply(...arguments);
+  }
 };
 
 ```
 
-
-
-```javascript
-
-/* hornyToad.js */
-
-module.exports = (dapperDan, fs) => {
-  // This component got prospects. 
-}
-
-```
