@@ -40,6 +40,8 @@ module.exports = (dep1, dep2) => {
 }
 ```
 
+Define the component in index.js or some application bootstrapping step:
+
 ```javascript
 container.register('myComponent', require('src/myComponent'), ['dep1', 'dep2']);
 const component = container.resolve('myComponent');
