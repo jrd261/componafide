@@ -81,7 +81,6 @@ module.exports = Pomade => {
 
 ```
 
-
 ## Constants, Native, and Global Gimmes
 
 Still use dependency injection. If it feels stupid your are probably still doing it right.
