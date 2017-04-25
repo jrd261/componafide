@@ -88,5 +88,5 @@ Still use dependency injection. If it feels stupid your are probably still doing
 
 ```javascript
 container.constant('scope.process', process);
-container.constant('pi', 3.14); // Because you might want to test what happens to your code when the universe implodes and pi changes to 23.
+container.constant('pi', 3.14);
 ```
