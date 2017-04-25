@@ -2,32 +2,24 @@
 
 module.exports = () => {
 
-  const generators = new Map();
+  const registry = new Map();
   const components = new Map();
 
-  async function resolve (name, children=new Set()) {
+  function resolve (name, children=new Set()) {
     if (components.has(name)) return components.get(name);
-    if (!generators.has(name)) throw new Error(`Component "${ name }" is not registered.`);
     if (children.has(name)) throw new Error(`Circular dependency detected for "${ name }".`);
     children.add(name);
-    components.set(name, await generators.get(name)(children));
-    return components.get(name);
-  }
-
-  function register (name, factory, dependencies) {
-    components.delete(name);
-    generators.set(name, children => inject(factory, dependencies, children));
-  }
-
-  async function inject (factory, dependencies, children) {
-    const components = [];
-    for (let name of dependencies) components.push(await resolve(name, children));
-    return await factory(...components);
+    if (!registry.has(name)) throw new Error(`Component "${ name }" is not registered.`);
+    const [dependencies, generator] = registry.get(name);
+    const component = generator(...dependencies.map(name => resolve(name, children)));
+    components.set(name, component);
+    return component;
   }
 
   return class {
-    static register (name, factory, ...dependencies) { return register(name, factory, dependencies); }
-    static async resolve (name) { return await resolve(name); }
+    static register (name, dependencies, generator) { registry.set(name, [dependencies, generator]); }
+    static constant (name, value) { registry.set(name, [[], () => value]); }
+    static resolve (name) { return resolve(name); }
   };
 
 };
