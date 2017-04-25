@@ -6,26 +6,18 @@ NodeJS got prospects. He's componafide.
 # Usage
 
 ## `const container = module();`
-## `container.register(name, [dependencies], generator);
+## `container.register(name, [dependencies], generator);`
 
 ```javascript
 container.register('myComponent', ['dep1', 'dep2'], (dep1, dep2) => { /* return myComponent */ });
 container.register('dep1', [], () => { /* return dep1 */ });
 ```
 
-
 ## `container.constant(name, value);`
 
-Convienience for `container.register(name, [], () => value);`.
-
+Convienience method for `container.register(name, [], () => value);`.
 
 ## `const component = container.resolve(name);`
-
-
-```javascript
-const myComponent = container.resolve('myComponent');
-```
-
 
 
 
